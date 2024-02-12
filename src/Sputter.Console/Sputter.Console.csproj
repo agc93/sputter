@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console.Analyzer" Version="0.48.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
+    <PackageReference Include="Spectre.Console.Cli.Extensions.DependencyInjection" Version="0.2.0" />
+    <PackageReference Include="Spectre.Console.Extensions.Progress" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sputter.Core\Sputter.Core.csproj" />
+    <ProjectReference Include="..\Sputter.DBus\Sputter.DBus.csproj" />
+    <ProjectReference Include="..\Sputter.HWMon\Sputter.HWMon.csproj" />
+    <ProjectReference Include="..\Sputter.Messaging\Sputter.Messaging.csproj" />
+    <ProjectReference Include="..\Sputter.MQTT\Sputter.MQTT.csproj" />
+    <ProjectReference Include="..\Sputter.Scrutiny\Sputter.Scrutiny.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>true</PublishTrimmed>
+    <SelfContained>true</SelfContained>
+    <TrimMode>partial</TrimMode>
+    <DebugType>Embedded</DebugType>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+</Project>

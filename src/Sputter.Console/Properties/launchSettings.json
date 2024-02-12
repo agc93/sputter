@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sputter.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "*Z52*"
+    }
+  }
+}
