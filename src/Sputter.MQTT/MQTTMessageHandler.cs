@@ -3,8 +3,8 @@ using Sputter.Core;
 using System.Text.Json;
 
 namespace Sputter.MQTT;
-public class MQTTMessageHandler(IOptions<MQTTConfiguration> config) {
-    private readonly IOptions<MQTTConfiguration> _config = config;
+public class MQTTMessageHandler(MQTTConfiguration config) {
+    private readonly MQTTConfiguration _config = config;
 
     public static string ToStateMessage(DriveMeasurement measurement) {
         var payload = new MQTTStatePayload {
@@ -15,13 +15,11 @@ public class MQTTMessageHandler(IOptions<MQTTConfiguration> config) {
     }
 
     internal MQTTClient BuildClient() {
-        (string, int?) serverUrl = _config.Value.Server.Split(':') is var parts && parts.Length > 1 && int.TryParse(parts[1], out var port)
-            ? (parts[0], port)
-            : (parts[0], null);
-        if (!string.IsNullOrWhiteSpace(_config.Value.UserName) && !string.IsNullOrWhiteSpace(_config.Value.Password)) {
-            return new MQTTClient(serverUrl.Item1, serverUrl.Item2 ?? _config.Value.Port, _config.Value.UserName, _config.Value.Password);
+        var (url, port) = _config.Parse();
+        if (!string.IsNullOrWhiteSpace(_config.UserName) && !string.IsNullOrWhiteSpace(_config.Password)) {
+            return new MQTTClient(url, port, _config.UserName, _config.Password);
         }
-        var client = new MQTTClient(serverUrl.Item1, serverUrl.Item2 ?? _config.Value.Port);
+        var client = new MQTTClient(url, port);
         return client;
     }
 }

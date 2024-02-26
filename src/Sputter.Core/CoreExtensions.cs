@@ -69,4 +69,24 @@ public static class CoreExtensions {
         }
         return output;
     }
+
+    public static void AddSource(this DriveMeasurement? measurement, string adapterName) {
+        if (measurement != null) {
+            var matching = measurement.States.FirstOrDefault(st => st.AttributeName == DriveAttributes.SourceAdapter);
+            if (matching != null) {
+                matching.Value = string.Join(';', matching.Value.Split(';').Concat([adapterName]));
+            } else {
+                measurement.States.Add(
+                    new DriveState {
+                        AttributeName = DriveAttributes.SourceAdapter,
+                        Value = adapterName
+                    });
+            }
+        }
+    }
+
+    public static Dictionary<string, DriveMeasurement?> ToDiskDictionary(this IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>> measurements, bool indexOnSerialNumber) {
+        var dict = measurements.ToDictionary(kv => indexOnSerialNumber ? kv.Key.UniqueId.SerialNumber : kv.Key.Id, v => v.Value, StringComparer.OrdinalIgnoreCase);
+        return dict;
+    }
 }

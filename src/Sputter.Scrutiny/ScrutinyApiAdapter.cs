@@ -1,13 +1,19 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sputter.Core;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Sputter.Scrutiny;
 
 public class ScrutinyApiAdapter : IDriveSensorAdapter {
+    public static string AdapterName => "scrutiny";
     public int Priority => 10;
     private readonly HttpClient? _client;
+    private readonly ILogger<ScrutinyApiAdapter>? _logger;
+    private readonly IFusionCache? _cache;
+    private const string _cacheKey = "scrutiny:summary";
 
     public ScrutinyApiAdapter(string apiBaseAddress) {
         _client = new HttpClient() {
@@ -15,24 +21,31 @@ public class ScrutinyApiAdapter : IDriveSensorAdapter {
         };
     }
 
-    public ScrutinyApiAdapter(ScrutinyConfiguration scrutinyConfig) {
+    private ScrutinyApiAdapter(IFusionCacheProvider? cacheProvider, ILogger<ScrutinyApiAdapter>? logger) {
+        _cache = cacheProvider?.GetCacheOrNull(Name);
+        _logger = logger;
+    }
 
+    public ScrutinyApiAdapter(ScrutinyConfiguration scrutinyConfig, IFusionCacheProvider? cache, ILogger<ScrutinyApiAdapter>? logger) : this(cache, logger) {
         _client = new HttpClient() {
             BaseAddress = new Uri(scrutinyConfig.ApiBaseAddress)
         };
     }
 
-    public ScrutinyApiAdapter(IOptions<ScrutinyConfiguration> scrutinyConfig) {
-
-        _client = new HttpClient() {
-            BaseAddress = new Uri(scrutinyConfig.Value.ApiBaseAddress)
-        };
+    public ScrutinyApiAdapter(IOptions<ScrutinyConfiguration> scrutinyConfig, IFusionCacheProvider? cache, ILogger<ScrutinyApiAdapter>? logger) : this(cache, logger) {
+        if (!string.IsNullOrWhiteSpace(scrutinyConfig.Value.ApiBaseAddress) && Uri.TryCreate(scrutinyConfig.Value.ApiBaseAddress, UriKind.Absolute, out var _)) {
+            _client = new HttpClient() {
+                BaseAddress = new Uri(scrutinyConfig.Value.ApiBaseAddress)
+            };
+        } else {
+            _logger?.LogDebug("No API address configured, skipping Scrutiny adapter setup.");
+        }
     }
 
-    public ScrutinyApiAdapter() {
+    //public ScrutinyApiAdapter() {
         
-    }
-    public string Name => "scrutiny";
+    //}
+    public string Name => AdapterName;
 
     private static bool MatchesFilter(ScrutinyDriveSummary driveSummary, string? filter) {
         if (filter == null) return true;
@@ -43,13 +56,14 @@ public class ScrutinyApiAdapter : IDriveSensorAdapter {
 
     public async Task<IEnumerable<DriveEntity>> DiscoverDrives(string? filter) {
         if (_client == null) return [];
-        var summary = await _client.GetFromJsonAsync("summary", SourceGenerationContext.Default.ApiResponseSummaryResponse);
+        //ApiResponse<SummaryResponse>? summary = await GetDriveSummary(_client);
         var drives = new List<DriveEntity>();
-        foreach (var drive in summary?.Value?.DriveSummaries ?? []) {
-            if ((!string.IsNullOrWhiteSpace(drive.Value.Device?.SerialNumber)) && MatchesFilter(drive.Value, filter)) {
-                var dev = drive.Value.Device;
+        var summaries = await GetSummaries();
+        foreach (var drive in summaries) {
+            if ((!string.IsNullOrWhiteSpace(drive.Device?.SerialNumber)) && MatchesFilter(drive, filter)) {
+                var dev = drive.Device;
                 var entity = new ScrutinyEntity(dev.SerialId ?? dev.WWN, new UniqueId(dev.SerialNumber, dev.ModelName)) {
-                    DriveSummary = drive.Value
+                    DriveSummary = drive
                 };
                 entity.UniqueId.WWN = dev.WWN;
                 drives.Add(entity);
@@ -89,11 +103,7 @@ public class ScrutinyApiAdapter : IDriveSensorAdapter {
                         new DriveState {
                             AttributeName = DriveAttributes.Healthy,
                             Value = (scrutinyDrive.DriveSummary.Device.DeviceStatus == 0).ToString()
-                        },
-                    new DriveState {
-                        AttributeName = "scrutiny",
-                        Value = "first"
-                    }
+                        }
                     ]
             };
         } else {
@@ -123,7 +133,12 @@ public class ScrutinyApiAdapter : IDriveSensorAdapter {
 
     private async Task<IEnumerable<ScrutinyDriveSummary>> GetSummaries() {
         if (_client == null) throw new ArgumentNullException(nameof(_client));
-        var summary = await _client.GetFromJsonAsync("summary", SourceGenerationContext.Default.ApiResponseSummaryResponse);
+        //var summary = await _client.GetFromJsonAsync("summary", SourceGenerationContext.Default.ApiResponseSummaryResponse);
+        var summary = _cache == null
+                ? await _client.GetFromJsonAsync("summary", SourceGenerationContext.Default.ApiResponseSummaryResponse)
+                : await _cache.GetOrSetAsync(_cacheKey, async token => {
+                    return await _client.GetFromJsonAsync("summary", SourceGenerationContext.Default.ApiResponseSummaryResponse, token);
+                });
         return summary?.Value.DriveSummaries.Values.ToList() ?? [];
     }
 }

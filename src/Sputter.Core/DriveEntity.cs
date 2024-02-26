@@ -5,7 +5,8 @@ namespace Sputter.Core;
 
 public class DriveEntity {
     [JsonConstructor]
-    private DriveEntity() { }
+    [Obsolete("Only used for JSON serialization", false)]
+    public DriveEntity() { }
 
     [SetsRequiredMembers]
     public DriveEntity(string id, UniqueId uniqueId) {

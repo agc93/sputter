@@ -7,6 +7,7 @@ public class DriveMeasurementService(IEnumerable<IDriveSensorAdapter> adapters, 
     private readonly List<IPublishTarget> _publishTargets = publishTargets.ToList();
     public bool Debug { get; set; } = false;
 
+    [Obsolete("Prefer providing discovery templates")]
     public async Task<IEnumerable<DriveEntity>> DiscoverDrivesAsync(string? driveSpec) {
         var drives = new List<DriveEntity>();
         foreach (var ad in _adapters.OrderBy(a => a.Priority)) {
@@ -15,10 +16,29 @@ public class DriveMeasurementService(IEnumerable<IDriveSensorAdapter> adapters, 
         return drives;
     }
 
-    public async Task<List<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrivesAsync(string? driveSpec) {
-        var drives = await DiscoverDrivesAsync(driveSpec);
-        var measurements = await MeasureDrivesAsync(drives);
-        return measurements;
+    public async Task<IEnumerable<DriveEntity>> DiscoverDrivesAsync(string? driveSpec, IEnumerable<DiscoveryTemplate>? discoverySpecs) {
+        discoverySpecs ??= [];
+        if (!string.IsNullOrWhiteSpace(driveSpec)) {
+            discoverySpecs = discoverySpecs.Append(new DiscoveryTemplate(driveSpec));
+        }
+        var drives = new List<DriveEntity>();
+        foreach (var ad in _adapters.OrderBy(a => a.Priority)) {
+            if (discoverySpecs.Any()) {
+                foreach (var spec in discoverySpecs.Where(ds => MatchesAdapter(ds, ad))) {
+                    drives.AddRange(await ad.DiscoverDrives(spec.Match));
+                }
+            } else {
+                //this should only ever be null, since if it wasn't, it should have been transformed into a discovery spec
+                drives.AddRange(await ad.DiscoverDrives(driveSpec));
+            }
+        }
+        return drives;
+    }
+
+    private static bool MatchesAdapter(DiscoveryTemplate template, IDriveSensorAdapter adapter) {
+        return template.SourceAdapter == null
+            || template.SourceAdapter == "*"
+            || string.Equals(template.SourceAdapter, adapter.Name, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public async Task<List<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrivesAsync(IEnumerable<DriveEntity> drives) {
@@ -91,6 +111,7 @@ public class DriveMeasurementService(IEnumerable<IDriveSensorAdapter> adapters, 
             DriveMeasurement? measure = null;
             for (var i = 0; measure == null && i < _adapters.Count; i++) {
                 measure = await _adapters[i].MeasureDrive(drive);
+                measure.AddSource(_adapters[i].Name);
             }
             if (measure != null) {
                 yield return new KeyValuePair<DriveEntity, DriveMeasurement?>(drive, measure);

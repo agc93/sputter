@@ -55,7 +55,6 @@ public class HWMonAdapter : IDriveSensorAdapter {
         var id = GetIdForBlockDevice(sysClassPath, out var deviceProps);
         if (id?.Value != null) {
             var sensor = GetSensorPathForDrive(sysClassPath);
-            Console.WriteLine(sensor);
             var drive = new HWMonEntity(id.Value.Key, id.Value.Value) {
                 SensorPath = sensor,
                 SoftwareVersion = deviceProps.GetValueOrDefault(HWMonConstants.FirmwareVersion),

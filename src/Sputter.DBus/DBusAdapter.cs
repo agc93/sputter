@@ -42,10 +42,11 @@ public class DBusAdapter : IDriveSensorAdapter {
             }
             var temp = ataProps.SmartTemperature - 273.15;
             return new DriveMeasurement(id) {
-                Sensors = [new DriveSensor { AttributeName = DriveAttributes.Temperature, Value = temp, Units = "°C" }],
+                Sensors = [
+                    new DriveSensor { AttributeName = DriveAttributes.Temperature, Value = temp, Units = "°C" }
+                ],
                 States = [
-                    new DriveState { AttributeName = DriveAttributes.Healthy, Value = (!ataProps.SmartFailing).ToString() },
-                    new DriveState { AttributeName = "Source", Value = "DBus"}
+                    new DriveState { AttributeName = DriveAttributes.Healthy, Value = (!ataProps.SmartFailing).ToString() }
                 ]
             };
         }

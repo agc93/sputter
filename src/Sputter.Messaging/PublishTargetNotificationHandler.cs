@@ -10,7 +10,7 @@ public class PublishTargetNotificationHandler(IEnumerable<IPublishTarget> publis
     public async Task Handle(DriveMeasurementNotification notification, CancellationToken cancellationToken) {
         var targets = notification.Targets ?? _publishTargets;
         var service = new DriveMeasurementService([], targets);
-        var res = await service.PublishMeasurementsResultsAsync(notification.Measurements).WaitForAll();
+        var _ = await service.PublishMeasurementsResultsAsync(notification.Measurements).WaitForAll();
         //foreach (var uniqueDrive in notification.Measurements) {
         //    if (uniqueDrive.Value != null) {
         //        foreach (var publisher in targets) {

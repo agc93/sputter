@@ -8,7 +8,7 @@ public class DriveDiscoveryRequestHandler(IEnumerable<IDriveSensorAdapter> adapt
     public async Task<IEnumerable<DriveEntity>> Handle(DriveDiscoveryRequest request, CancellationToken cancellationToken) {
         var allAdapters = (adapters ?? []).Concat(request.AdditionalAdapters ?? []);
         var service = new DriveMeasurementService(allAdapters, publishers ?? []);
-        var drives = await service.DiscoverDrivesAsync(request.DriveFilter);
+        var drives = await service.DiscoverDrivesAsync(request.DriveFilter, request.Templates);
         return drives;
     }
 }

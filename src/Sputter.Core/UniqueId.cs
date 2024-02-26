@@ -6,7 +6,8 @@ namespace Sputter.Core {
         public static bool MatchOnModelNumber { get; set; } = false;
 
         [JsonConstructor]
-        private UniqueId() { }
+		[Obsolete("Only used for JSON serialization", false)]
+		public UniqueId() { }
 
         [SetsRequiredMembers]
         public UniqueId(string serial, string? modelNumber) {

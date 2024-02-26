@@ -10,7 +10,7 @@ public class HomeAssistantSensorDetails(string uniqueId) {
     public (string? On, string? Off) StatePayload { get; set; }
     public string? FriendlyName { get; set; }
 
-    public HomeAssistantDiscoveryPayload ToDiscoveryPayload(HomeAssistantDevicePayload device, string stateTopic) {
+    public HomeAssistantDiscoveryPayload ToDiscoveryPayload(HomeAssistantDevicePayload device, string stateTopic, bool forceEnable = false) {
         var payload = new HomeAssistantDiscoveryPayload(device, stateTopic) {
             StateClass = StateClass,
             DeviceClass = DeviceClass,
@@ -20,7 +20,7 @@ public class HomeAssistantSensorDetails(string uniqueId) {
             ValueTemplate = ValueTemplate,
             OnStatePayload = StatePayload.On,
             OffStatePayload = StatePayload.Off,
-            EnabledByDefault = false,
+            EnabledByDefault = forceEnable || StateClass == "measurement",
         };
         return payload;
     }

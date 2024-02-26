@@ -24,7 +24,7 @@ public class MeasureCommand : AsyncCommand<MeasureCommand.Settings> {
                 ApiBaseAddress = settings.ScrutinyApiAddress
             };
             var scrutinyOpts = Options.Create(scrutiny);
-            req.AdditionalAdapters.Add(new ScrutinyApiAdapter(scrutinyOpts));
+            req.AdditionalAdapters.Add(new ScrutinyApiAdapter(scrutinyOpts, null, null));
         }
         var res = await mediator.Send(req);
         var notif = new DriveMeasurementNotification(res) {

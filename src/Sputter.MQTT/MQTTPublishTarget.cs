@@ -5,23 +5,28 @@ using Sputter.Core;
 namespace Sputter.MQTT;
 
 public class MQTTPublishTarget : IPublishTarget {
-    private readonly IOptions<MQTTConfiguration>? _config;
+    private readonly Func<MQTTConfiguration?> _config;
 
     public MQTTPublishTarget() {
-
+        _config = () => null;
     }
 
     public MQTTPublishTarget(IOptions<MQTTConfiguration> config) : this() {
-        _config = config;
+        _config = () => config.Value;
+    }
+
+    public MQTTPublishTarget(IOptionsSnapshot<MQTTConfiguration>? monitor) : this() {
+		_config = monitor == null
+			? () => null
+			: () => monitor.Value;
     }
 
     public async Task<Result> PublishMeasurement(MeasurementResult result) {
         var topic = result.Drive.ToStateTopic();
-        Console.WriteLine($"Payload for {topic}");
         var payload = MQTTMessageHandler.ToStateMessage(result.Measurement);
-        Console.WriteLine(payload);
-        if (_config != null) {
-            var mqtt = new MQTTMessageHandler(_config);
+        var conf = _config();
+        if (conf != null) {
+            var mqtt = new MQTTMessageHandler(conf);
             using var client = mqtt.BuildClient();
             var res = await client.SendPayload(topic, payload);
             return res;

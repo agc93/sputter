@@ -9,6 +9,8 @@ public class AggregatedDriveMeasurementService(IEnumerable<IDriveSensorAdapter> 
         return _measurer.DiscoverDrivesAsync(driveSpec);
     }
 
+    public Task<IEnumerable<DriveEntity>> DiscoverDrivesAsync(string? driveSpec, IEnumerable<DiscoveryTemplate>? discoverySpecs) => ((IMeasurementService)_measurer).DiscoverDrivesAsync(driveSpec, discoverySpecs);
+
     public async IAsyncEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>> MeasureDrives(IEnumerable<DriveEntity> drives) {
         var measurements = await _measurer.MeasureDrives(drives).WaitForAll();
         var merged = measurements.AggregateMeasurements();

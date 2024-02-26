@@ -396,3 +396,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Ignore HA Add-on testing files
+addon.json
+
+# Ignore Development settings file to avoid ""secrets""
+appsettings.Development.json

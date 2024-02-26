@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.141">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Parlot" Version="0.0.24" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+    <PackageReference Include="ZiggyCreatures.FusionCache" Version="0.26.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sputter.DBus\Sputter.DBus.csproj" />
+    <ProjectReference Include="..\Sputter.HWMon\Sputter.HWMon.csproj" />
+    <ProjectReference Include="..\Sputter.Messaging\Sputter.Messaging.csproj" />
+    <ProjectReference Include="..\Sputter.MQTT\Sputter.MQTT.csproj" />
+    <ProjectReference Include="..\Sputter.Scrutiny\Sputter.Scrutiny.csproj" />
+  </ItemGroup>
+
+</Project>

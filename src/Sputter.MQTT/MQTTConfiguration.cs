@@ -9,4 +9,5 @@ public class MQTTConfiguration {
     public int? Port { get; set; }
     public bool? EnableHomeAssistant { get; set; }
     public HomeAssistantConfiguration? HomeAssistant { get; set; }
+    public int ReconnectDelay { get; set; } = 5;
 }

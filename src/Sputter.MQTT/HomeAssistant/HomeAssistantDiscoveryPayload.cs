@@ -25,6 +25,9 @@ public class HomeAssistantDiscoveryPayload {
     [JsonPropertyName("entity_category")]
     public string? EntityCategory { get; set; }
 
+    [JsonPropertyName("expire_after")]
+    public int? ExpiryTimeSeconds { get; set; }
+
     public string? Name { get; set; }
 
     [JsonPropertyName("state_class")]

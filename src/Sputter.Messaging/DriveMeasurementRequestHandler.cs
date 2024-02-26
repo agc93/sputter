@@ -8,10 +8,13 @@ public class DriveMeasurementRequestHandler(IEnumerable<IDriveSensorAdapter> ada
         var allAdapters = (adapters ?? []).Concat(request.AdditionalAdapters ?? []);
         var service = new DriveMeasurementService(allAdapters, publishers ?? []);
         if (request.Drives == null) {
-            var drives = await service.DiscoverDrivesAsync(request.DriveFilter);
-            request.Drives = drives;
+            if (request.EnableDriveDiscovery) {
+                var drives = await service.DiscoverDrivesAsync(request.DriveFilter, request.FilterTemplates);
+                request.Drives = drives ?? [];
+            } else {
+                request.Drives = [];
+            }
         }
-        request.Drives ??= [];
         var results = await service.MeasureDrives(request.Drives).WaitForAll();
         return results;
     }

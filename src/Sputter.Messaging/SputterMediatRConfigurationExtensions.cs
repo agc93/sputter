@@ -10,10 +10,14 @@ public static class SputterMediatRConfigurationExtensions {
         return services;
     }
 
-    public static IServiceCollection AddSputterDefaults(this IServiceCollection services, IEnumerable<Type> adapterTypes, ServiceLifetime lifetime = ServiceLifetime.Transient) {
+    public static IServiceCollection AddSputterDefaults(this IServiceCollection services, IEnumerable<Type> adapterTypes, IEnumerable<Type>? publishTargets = null, ServiceLifetime lifetime = ServiceLifetime.Transient) {
+        publishTargets ??= [];
         var adapters = adapterTypes.Where(t => t.IsAssignableTo(typeof(IDriveSensorAdapter)));
         foreach (var item in adapters) {
             services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), item, lifetime));
+        }
+        foreach (var item in publishTargets) {
+            services.Add(new ServiceDescriptor(typeof(IPublishTarget), item, lifetime));
         }
         services.Add(new ServiceDescriptor(typeof(IMeasurementService), typeof(DriveMeasurementService), lifetime));
         return services;
@@ -26,19 +30,6 @@ public static class SputterMediatRConfigurationExtensions {
 
     public static IServiceCollection AddSputter<TAdapter>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient) where TAdapter : IDriveSensorAdapter {
         services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), typeof(TAdapter), lifetime));
-        return services;
-    }
-
-    public static IServiceCollection AddSputter<TAdapter, TAdapter2>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient) where TAdapter : IDriveSensorAdapter {
-        services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), typeof(TAdapter), lifetime));
-        services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), typeof(TAdapter2), lifetime));
-        return services;
-    }
-
-    public static IServiceCollection AddSputter<TAdapter, TAdapter2, TAdapter3>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient) where TAdapter : IDriveSensorAdapter {
-        services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), typeof(TAdapter), lifetime));
-        services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), typeof(TAdapter2), lifetime));
-        services.Add(new ServiceDescriptor(typeof(IDriveSensorAdapter), typeof(TAdapter3), lifetime));
         return services;
     }
 
@@ -78,7 +69,7 @@ public static class SputterMediatRConfigurationExtensions {
         sputterConfig ??= conf => { };
         var serviceConfig = new SputterMediatRConfiguration();
         sputterConfig.Invoke(serviceConfig);
-        configuration.AddSputterComponents(sputterConfig);
+        configuration.AddSputterComponents(serviceConfig);
         return configuration;
     }
 }
