@@ -108,7 +108,7 @@ public class HWMonAdapter : IDriveSensorAdapter {
                 var details = File.ReadAllLines(udevPath).Where(l => l.StartsWith("E:")).Select(k => k.Replace("E:", string.Empty).Split('=')).Where(p => p.Length == 2);
                 var dict = details.ToDictionary(k => k[0], v => v[1]);
                 if (dict.TryGetValue(HWMonConstants.SerialNumber, out string? shortSerial)) {
-                    var unique = new UniqueId(shortSerial, HWMonConstants.Model) {
+                    var unique = new UniqueId(shortSerial, dict.GetValueOrDefault(HWMonConstants.Model)) {
                         WWN = dict.GetValueOrDefault(HWMonConstants.WWN)
                     };
                     otherProperties = dict.Concat(otherProperties).ToDictionary(k => k.Key, v => v.Value);
