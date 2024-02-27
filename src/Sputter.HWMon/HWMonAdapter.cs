@@ -94,25 +94,28 @@ public class HWMonAdapter : IDriveSensorAdapter {
     private static KeyValuePair<string, UniqueId>? GetIdForBlockDevice(string sysClassPath, out Dictionary<string, string> otherProperties) {
         otherProperties = [];
         var rootDeviceName = new DirectoryInfo(sysClassPath).Name;
-        var blockDeviceName = Directory.GetDirectories("/sys/block", rootDeviceName + "*").FirstOrDefault();
-        if (blockDeviceName == null) return null;
-        var size = System.IO.File.ReadAllLines(blockDeviceName).FirstOrDefault();
-        if (size != null) {
-            otherProperties.Add(HWMonConstants.Capacity, size);
-        }
-        var blockDeviceNumber = Directory.ResolveLinkTarget(Path.Combine(blockDeviceName, "bdi"), true)?.Name;
-        var udevPath = $"/run/udev/data/b{blockDeviceNumber}";
-        if (udevPath != null && File.Exists(udevPath)) {
-            var details = File.ReadAllLines(udevPath).Where(l => l.StartsWith("E:")).Select(k => k.Replace("E:", string.Empty).Split('=')).Where(p => p.Length == 2);
-            var dict = details.ToDictionary(k => k[0], v => v[1]);
-            if (dict.TryGetValue(HWMonConstants.SerialNumber, out string? shortSerial)) {
-                var unique = new UniqueId(shortSerial, HWMonConstants.Model) {
-                    WWN = dict.GetValueOrDefault(HWMonConstants.WWN)
-                };
-                otherProperties = dict;
-                return new(dict.GetValueOrDefault(HWMonConstants.DiskIdentifier) ?? shortSerial, unique);
+        try {
+            var blockDeviceName = Directory.GetDirectories("/sys/block", rootDeviceName + "*").FirstOrDefault();
+            if (blockDeviceName == null) return null;
+            var sizeFile = Path.Combine(blockDeviceName, "size");
+            var size = File.Exists(sizeFile) ? File.ReadAllLines(Path.Combine(blockDeviceName, "size")).FirstOrDefault() : null;
+            if (size != null) {
+                otherProperties.Add(HWMonConstants.Capacity, size);
             }
-        }
+            var blockDeviceNumber = Directory.ResolveLinkTarget(Path.Combine(blockDeviceName, "bdi"), true)?.Name;
+            var udevPath = $"/run/udev/data/b{blockDeviceNumber}";
+            if (udevPath != null && File.Exists(udevPath)) {
+                var details = File.ReadAllLines(udevPath).Where(l => l.StartsWith("E:")).Select(k => k.Replace("E:", string.Empty).Split('=')).Where(p => p.Length == 2);
+                var dict = details.ToDictionary(k => k[0], v => v[1]);
+                if (dict.TryGetValue(HWMonConstants.SerialNumber, out string? shortSerial)) {
+                    var unique = new UniqueId(shortSerial, HWMonConstants.Model) {
+                        WWN = dict.GetValueOrDefault(HWMonConstants.WWN)
+                    };
+                    otherProperties = dict;
+                    return new(dict.GetValueOrDefault(HWMonConstants.DiskIdentifier) ?? shortSerial, unique);
+                }
+            }
+        } catch {}
         return null;
     }
 
