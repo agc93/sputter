@@ -7,30 +7,30 @@ namespace Sputter.Server;
 
 internal static class ServerExtensions {
 
-    internal static JsonSerializerOptions JsonOptions { get; } = new JsonSerializerOptions() {
-        WriteIndented = true,
-    };
+    //internal static JsonSerializerOptions JsonOptions { get; } = new JsonSerializerOptions() {
+    //    WriteIndented = true,
+    //};
 
-    internal static TObject DumpToConsole<TObject>(this TObject @object) {
-        var output = "NULL";
-        if (@object != null) {
-            output = JsonSerializer.Serialize(@object, ServerExtensions.JsonOptions);
-        }
+ //   internal static TObject DumpToConsole<TObject>(this TObject @object) {
+ //       var output = "NULL";
+ //       if (@object != null) {
+ //           output = JsonSerializer.Serialize(@object, ServerExtensions.JsonOptions);
+ //       }
 
-        Console.WriteLine($"[{@object?.GetType().Name}]:\r\n{output}");
-        return @object;
-    }
+ //       Console.WriteLine($"[{@object?.GetType().Name}]:\r\n{output}");
+ //       return @object;
+ //   }
 
-	internal static string DumpToString<TObject>(this TObject @object)
-	{
-		var output = "NULL";
-		if (@object != null)
-		{
-			output = JsonSerializer.Serialize(@object, ServerExtensions.JsonOptions);
-		}
+	//internal static string DumpToString<TObject>(this TObject @object)
+	//{
+	//	var output = "NULL";
+	//	if (@object != null)
+	//	{
+	//		output = JsonSerializer.Serialize(@object, ServerExtensions.JsonOptions);
+	//	}
 
-        return output;
-	}
+ //       return output;
+	//}
 
     internal static async Task<IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrives(this IMediator mediator, string? filter, CancellationToken? cancellationToken = null, bool publishMeasurements = true, bool throwOnNoDrives = false) {
         var stopToken = cancellationToken ?? CancellationToken.None;

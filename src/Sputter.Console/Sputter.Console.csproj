@@ -20,6 +20,18 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <IsPublishable>true</IsPublishable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>sputter</ToolCommandName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(StandalonePublish)'=='true'">
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -27,12 +39,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>true</PublishTrimmed>
-    <SelfContained>true</SelfContained>
-    <TrimMode>partial</TrimMode>
-    <DebugType>Embedded</DebugType>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
 

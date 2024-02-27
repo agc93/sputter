@@ -402,3 +402,7 @@ addon.json
 
 # Ignore Development settings file to avoid ""secrets""
 appsettings.Development.json
+
+dist/
+artifacts/
+tools/*

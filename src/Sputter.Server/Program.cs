@@ -21,7 +21,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.Configure<RouteOptions>(routeOptions =>
 {
-    routeOptions.ConstraintMap.Add("adapter", typeof(AdapterRouteConstraint));
+	routeOptions.SetParameterPolicy("adapter", typeof(AdapterRouteConstraint));
+    //routeOptions.ConstraintMap.Add("adapter", typeof(AdapterRouteConstraint));
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

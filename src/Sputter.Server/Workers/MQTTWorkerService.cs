@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
-using Sputter.Core;
 using Sputter.MQTT;
 using System.Text;
 using System.Text.Json;
@@ -92,11 +91,11 @@ public class MQTTWorkerService : BackgroundService {
     private async Task OnMessageReceived(MqttApplicationMessageReceivedEventArgs e, CancellationToken stopToken) {
         _logger.LogDebug($"Received MQTT command message!");
         if (_logger.IsEnabled(LogLevel.Debug)) {
-            _logger.LogDebug("MQTT message contents: {Message}", e.DumpToString());
+            _logger.LogDebug("MQTT message contents: {Message}", Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment));
         }
         if (e.ApplicationMessage.PayloadSegment.Count > 0) {
             try {
-                var message = JsonSerializer.Deserialize<MQTTWorkerCommand>(Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment));
+                var message = JsonSerializer.Deserialize(Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment), MQTTWorkerJsonContext.Default.MQTTWorkerCommand);
                 if (!string.IsNullOrWhiteSpace(message?.Command)) {
                     switch (message.Command) {
                         case "getLatest":
