@@ -111,7 +111,7 @@ public class HWMonAdapter : IDriveSensorAdapter {
                     var unique = new UniqueId(shortSerial, HWMonConstants.Model) {
                         WWN = dict.GetValueOrDefault(HWMonConstants.WWN)
                     };
-                    otherProperties = dict;
+                    otherProperties = dict.Concat(otherProperties).ToDictionary(k => k.Key, v => v.Value);
                     return new(dict.GetValueOrDefault(HWMonConstants.DiskIdentifier) ?? shortSerial, unique);
                 }
             }

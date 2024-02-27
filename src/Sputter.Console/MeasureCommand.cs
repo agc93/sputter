@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Humanizer;
+using MediatR;
 using Microsoft.Extensions.Options;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -27,6 +28,7 @@ public class MeasureCommand : AsyncCommand<MeasureCommand.Settings> {
             req.AdditionalAdapters.Add(new ScrutinyApiAdapter(scrutinyOpts, null, null));
         }
         var res = await mediator.Send(req);
+        PrintResults(res);
         var notif = new DriveMeasurementNotification(res) {
             Targets = publishers
         };
@@ -35,6 +37,36 @@ public class MeasureCommand : AsyncCommand<MeasureCommand.Settings> {
         }
         await mediator.Publish(notif);
         return 0;
+    }
+
+    private void PrintResults(IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>> measurements) {
+        var table = new Table();
+        table.AddColumn("Drive");
+        table.AddColumn(new TableColumn(new Markup("[grey]Serial[/]")));
+        table.AddColumn(new TableColumn(new Markup("Information")));
+        table.AddColumn(new TableColumn(new Markup("[darkred_1]Temperature[/]")));
+        table.AddColumn(new TableColumn(new Markup("States")));
+
+        foreach (var measure in measurements) {
+            var propsTable = new Table();
+            propsTable.AddColumn("Property").AddColumn("Value").HideHeaders();
+            if (measure.Value != null) {
+                propsTable.AddIfSet(nameof(measure.Key.Model), measure.Key.Model);
+                propsTable.AddIfSet(nameof(measure.Key.Name), measure.Key.Name);
+                if (measure.Key.Capacity != null && double.TryParse(measure.Key.Capacity, out var d)) { 
+                    propsTable.AddIfSet("Size", d.Bytes().ToString("#.#"));
+                }
+                var temp = measure.Value.Sensors.FirstOrDefault(s => s.AttributeName == DriveAttributes.Temperature);
+                table.AddRow(
+                    new Markup(measure.Key.Id),
+                    new Markup(measure.Key.UniqueId.SerialNumber),
+                    propsTable,
+                    new Panel(temp == null ? "???" : temp.Value.ToString() + temp.Units),
+                    new Markup(string.Join(Environment.NewLine, measure.Value.States.Select(s => $"{(s.FriendlyName ?? s.AttributeName)}: [steelblue3]{s.Value}[/]")))
+                    );
+            }
+        }
+        AnsiConsole.Write(table);
     }
 
     public sealed class Settings : SputterSettings {

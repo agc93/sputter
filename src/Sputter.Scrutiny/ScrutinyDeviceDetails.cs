@@ -17,6 +17,7 @@ public class ScrutinyDeviceDetails {
     public required string SerialNumber { get; set; }
     [JsonPropertyName("device_status")]
     public double? DeviceStatus { get; set; }
+    [JsonPropertyName("capacity")]
     public double? Size { get; set; }
     public string? Firmware { get; set; }
 }
