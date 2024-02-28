@@ -23,9 +23,9 @@ public class HomeAssistantConfigurationProvider(FileConfigurationSource source) 
 
     public override void Load(Stream stream) {
         try {
+            Console.WriteLine($"Loading HA addon configuration from file");
             var content = JsonSerializer.Deserialize<HomeAssistantConfigurationSchema>(stream, HomeAssistantSchemaContext.Default.HomeAssistantConfigurationSchema);
             if (content != null) {
-                Console.WriteLine($"Loading HA addon configuration from 'options.json'");
                 Console.WriteLine(JsonSerializer.Serialize(content, HomeAssistantSchemaContext.Default.HomeAssistantConfigurationSchema));
                 var dict = new Dictionary<string, string?>(StringComparer.Ordinal);
                 LoadIfSet(dict, content.AutoMeasureInterval, $"Sputter:{nameof(ServerConfiguration.AutoMeasureInterval)}");

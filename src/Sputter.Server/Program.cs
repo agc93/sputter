@@ -31,6 +31,7 @@ builder.Services.AddSwaggerGen();
 #if DEBUG
 builder.Configuration.AddHomeAssistantAddOnConfiguration("addon.json");
 #endif
+Console.WriteLine($"Add-on file present: {File.Exists("/data/options.json")}");
 builder.Configuration.AddHomeAssistantAddOnConfiguration();
 builder.Configuration.AddJsonFile("config.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddEnvironmentVariables();
