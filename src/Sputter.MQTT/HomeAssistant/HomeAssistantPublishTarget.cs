@@ -51,7 +51,9 @@ public class HomeAssistantPublishTarget : IPublishTarget {
     }
 
     public async Task<Result> PublishMeasurement(MeasurementResult measurementResult) {
+        _logger?.LogTrace("HA Publish Target loaded for {DriveId}", measurementResult.Drive.UniqueId);
         if (_config?.EnableHomeAssistant == true) {
+            _logger?.LogDebug("Running HA Discovery publisher for {DriveId}", measurementResult.Drive.UniqueId);
             var measure = measurementResult.Measurement;
             var drive = measurementResult.Drive;
             var topic = drive.ToStateTopic();
@@ -64,8 +66,10 @@ public class HomeAssistantPublishTarget : IPublishTarget {
                     if (sensor.HasValue) { sensors.Add(sensor.Value.Key, sensor.Value.Value); }
                 }
             }
+            _logger?.LogTrace("Loaded {SensorCount} sensors for drive from {SensorsCount}/{StateCount} measurements", sensors.Count, measurementResult.Measurement.Sensors.Count, measurementResult.Measurement.States.Count);
             var device = UnifiedMode ? GetSputterDevice() : GetDriveDevice(drive);
             if (_config?.Server != null) {
+                _logger?.LogTrace("Preparing sensors for {Server} in {DeviceMode} mode", _config.Server, UnifiedMode ? "Unified" : "per-device");
                 var mqtt = new MQTTMessageHandler(_config);
                 using var client = mqtt.BuildClient();
                 var results = new List<Result>();
@@ -81,6 +85,7 @@ public class HomeAssistantPublishTarget : IPublishTarget {
                     var res = await client.SendPayload(sensor.Key, json);
                     results.Add(res);
                 }
+                _logger?.LogDebug("Published {SuccessCount}/{TotalCount} discovery messages", results.Count(r => r.IsSuccess), sensors.Count);
                 return results.All(r => r.IsSuccess) ? Result.Ok() : Result.Fail("At least one sensor failed to be published!");
 
             } else {
