@@ -180,19 +180,17 @@ Task("NuGet")
 Task("Build-Docker-Image")
 	.WithCriteria(IsRunningOnUnix())
 	.IsDependentOn("Publish-Runtime")
-	.WithCriteria(() => string.IsNullOrWhiteSpace(EnvironmentVariable("QUAY_TOKEN")))
 	.Does(() =>
 {
     var dockerFileName = "publish.Dockerfile";
 	Information("Building Docker image...");
 	CopyFileToDirectory($"./build/{dockerFileName}", artifacts);
-	var bSettings = new DockerBuildXBuildSettings {
-        Tag = new[] { $"sputter/server:{packageVersion}", $"quay.io/sputter/server:{packageVersion}"},
+	var bSettings = new DockerImageBuildSettings {
+        Tag = new[] { $"sputter/server:{packageVersion}"},
         File = artifacts + dockerFileName,
-        BuildArg = new[] {$"package_version={packageVersion}"},
-		Platform = new[] { "linux/arm64", "linux/arm", "linux/amd64"}
+        BuildArg = new[] {$"package_version={packageVersion}"}
     };
-	DockerBuildXBuild(bSettings, artifacts);
+	DockerBuild(bSettings, artifacts);
 	DeleteFile(artifacts + dockerFileName);
 });
 
