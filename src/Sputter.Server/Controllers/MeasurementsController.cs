@@ -59,15 +59,18 @@ public class MeasurementsController(ILogger<MeasurementsController>? logger, IMe
         if (string.IsNullOrWhiteSpace(requestModel.Filter) && driveReader != null) {
             var templates = driveReader.GetSpecifications();
             if (templates != null && templates.Count > 0) {
-                var res = await mediator.MeasureDrives(templates, HttpContext.RequestAborted, requestModel.EnablePublishing);
+                logger?.LogDebug("Loaded {TemplateCount} from template reader, starting measurement gathering", templates.Count);
+                var res = await mediator.MeasureDrives(templates, HttpContext.RequestAborted, requestModel.EnablePublishing, logger: logger);
                 return Ok(res.ToDiskDictionary(requestModel.UseSerialNumbers));
             } else {
-                var res = await mediator.MeasureDrives(requestModel.Filter, HttpContext.RequestAborted, requestModel.EnablePublishing);
+                logger?.LogDebug("Loaded drive filter from request, starting measurement gathering");
+                var res = await mediator.MeasureDrives(requestModel.Filter, HttpContext.RequestAborted, requestModel.EnablePublishing, logger: logger);
                 return Ok(res.ToDiskDictionary(requestModel.UseSerialNumbers));
             }
             
         } else {
-            var res = await mediator.MeasureDrives(requestModel.Filter, HttpContext.RequestAborted, requestModel.EnablePublishing);
+            logger?.LogDebug("Falling back to legacy discovery and measurement request behaviour");
+            var res = await mediator.MeasureDrives(requestModel.Filter, HttpContext.RequestAborted, requestModel.EnablePublishing, logger: logger);
             return Ok(res.ToDiskDictionary(requestModel.UseSerialNumbers));
         }
 

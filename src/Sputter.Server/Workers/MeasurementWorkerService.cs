@@ -12,24 +12,24 @@ public class MeasurementWorkerService(IServiceProvider services, ILogger<Measure
     private Timer? _timer;
     private CancellationToken _cancellationToken;
     private IDisposable? _monitor;
-    //private Debouncer _debouncer = new Debouncer(TimeSpan.FromSeconds(3));
 
     public Task StartAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Timed Hosted Service running.");
         _cancellationToken = cancellationToken;
         if (serverConfig.CurrentValue.AutoMeasureInterval != null && serverConfig.CurrentValue.AutoMeasureInterval.Value > 0) {
             var delay = serverConfig.CurrentValue.AutoMeasureInterval.Value;
+            logger.LogDebug("Configuring initial timer for interval of {Interval}s", delay);
             _timer = new Timer(RunMeasurementInterval, 
                 state: null, 
                 TimeSpan.FromSeconds(Math.Max(20, delay*0.2)),
                 TimeSpan.FromSeconds(delay));
         }
         _monitor = serverConfig.OnChangeDedup((c) => {
-                logger?.LogInformation("Configuration change detected, reloading measurement timer!");
+                logger.LogInformation("Configuration change detected, reloading measurement timer!");
                 _timer?.Dispose();
                 if (c.AutoMeasureInterval != null && c.AutoMeasureInterval.Value > 0) {
                     var delay = c.AutoMeasureInterval.Value;
-                    logger?.LogDebug("Configuring timer for new interval of {Interval}s", delay);
+                    logger.LogDebug("Configuring timer for new interval of {Interval}s", delay);
                     _timer = new Timer(RunMeasurementInterval,
                         state: null,
                         TimeSpan.FromSeconds(Math.Max(20, delay * 0.2)),
@@ -45,13 +45,17 @@ public class MeasurementWorkerService(IServiceProvider services, ILogger<Measure
     }
 
     private async Task RunMeasurement() {
+        logger.LogTrace("Running scheduled measurement from worker service");
         var driveReader = services.GetService<DriveSpecificationReader>();
         await using var scope = services.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         if (driveReader != null) {
+            logger.LogTrace("Using template reader to read drive specifications");
             var templates = driveReader.GetSpecifications();
+            logger.LogDebug("Timed measurement worker loaded {TemplateCount} templates", templates.Count);
             var _ = await mediator.MeasureDrives(templates, _cancellationToken, templates != null && templates.Count > 0);
         } else if (serverConfig.CurrentValue.AllowPublishingAll) {
+            logger.LogDebug("Timed measurement worker publishing all discovered drives...");
             var _ = await mediator.MeasureDrives("*", _cancellationToken, publishMeasurements: true);
         }
     }

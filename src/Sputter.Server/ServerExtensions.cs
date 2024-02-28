@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Sputter.Core;
 using Sputter.Messaging;
 using System.Text.Json;
@@ -32,31 +33,37 @@ internal static class ServerExtensions {
  //       return output;
 	//}
 
-    internal static async Task<IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrives(this IMediator mediator, string? filter, CancellationToken? cancellationToken = null, bool publishMeasurements = true, bool throwOnNoDrives = false) {
+    internal static async Task<IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrives(this IMediator mediator, string? filter, CancellationToken? cancellationToken = null, bool publishMeasurements = true, bool throwOnNoDrives = false, ILogger? logger = null) {
         var stopToken = cancellationToken ?? CancellationToken.None;
         //var template = new DiscoveryTemplate(filter ?? "*");
         //return await mediator.MeasureDrives([template], stopToken, publishMeasurements, throwOnNoDrives);
         var driveReq = new DriveDiscoveryRequest() { DriveFilter = filter };
         var drives = await mediator.Send(driveReq, stopToken);
         if (drives == null && throwOnNoDrives) throw new Core.Diagnostics.DrivesNotFoundException();
+		logger?.LogDebug("Discovered {DriveCount} from discovery request", (drives ?? []).Count());
         var req = new DriveMeasurementRequest(drives!);
         var res = await mediator.Send(req, stopToken);
+		logger?.LogDebug("Retrieved {MesurementCount} measurements from loaded adapters", res.Count());
         if (publishMeasurements) {
+			logger?.LogDebug("Publishing measurements to available publish targets");
             var notif = new DriveMeasurementNotification(res);
             await mediator.Publish(notif, stopToken);
         }
         return res;
     }
 
-    internal static async Task<IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrives(this IMediator mediator, IEnumerable<DiscoveryTemplate> templates, CancellationToken? cancellationToken = null, bool publishMeasurements = true, bool throwOnNoDrives = false) {
+    internal static async Task<IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>> MeasureDrives(this IMediator mediator, IEnumerable<DiscoveryTemplate> templates, CancellationToken? cancellationToken = null, bool publishMeasurements = true, bool throwOnNoDrives = false, ILogger? logger = null) {
         var stopToken = cancellationToken ?? CancellationToken.None;
         var driveReq = new DriveDiscoveryRequest() { Templates = templates.ToList() };
         var drives = await mediator.Send(driveReq, stopToken);
         if (drives == null && throwOnNoDrives) throw new Core.Diagnostics.DrivesNotFoundException();
-        var req = new DriveMeasurementRequest(drives!);
+		logger?.LogDebug("Discovered {DriveCount} from discovery request", (drives ?? []).Count());
+		var req = new DriveMeasurementRequest(drives!);
         var res = await mediator.Send(req, stopToken);
-        if (publishMeasurements) {
-            var notif = new DriveMeasurementNotification(res);
+		logger?.LogDebug("Retrieved {MesurementCount} measurements from loaded adapters", res.Count());
+		if (publishMeasurements) {
+			logger?.LogDebug("Publishing measurements to available publish targets");
+			var notif = new DriveMeasurementNotification(res);
             await mediator.Publish(notif, stopToken);
         }
         return res;

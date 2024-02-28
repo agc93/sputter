@@ -46,7 +46,7 @@ builder.Services.AddFusionCache(ScrutinyApiAdapter.AdapterName).TryWithAutoSetup
 
 //I'm hoping that loading the HA target before the publish target will fix weird behaviour around HA marking devices as Unavailable
 builder.Services.AddScoped<IPublishTarget, HomeAssistantPublishTarget>();
-builder.Services.AddScoped<IPublishTarget>(p => new MQTTPublishTarget(p.GetService<IOptionsSnapshot<MQTTConfiguration>>()));
+builder.Services.AddScoped<IPublishTarget>(p => new MQTTPublishTarget(p.GetService<IOptionsSnapshot<MQTTConfiguration>>(), p.GetService<ILogger<MQTTPublishTarget>>()));
 
 builder.Services.AddMediatR(m => {
     m.AddSputterComponents(s => s.EnableAggregation());
