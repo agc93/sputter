@@ -7,8 +7,8 @@ LABEL \
   io.hass.description="Run the Sputter measurement server inside Home Assistant" \
   io.hass.version="${package_version}" \
   io.hass.type="addon" \
-  io.hass.arch="amd64"
+  io.hass.arch="armhf|aarch64|amd64"
 
 COPY publish/Sputter.Server/dotnet-any/ .
-COPY /app ./
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "Sputter.Server.dll"]

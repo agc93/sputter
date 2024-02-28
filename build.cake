@@ -211,7 +211,7 @@ Task("Publish-Docker-Image")
 	Information("Building Docker image...");
 	CopyFileToDirectory($"./build/{dockerFileName}", artifacts);
 	var bSettings = new DockerBuildXBuildSettings {
-        Tag = new[] { $"sputter/server:{packageVersion}", $"quay.io/sputter/server:{packageVersion}"},
+        Tag = new[] { $"quay.io/sputter/server:{packageVersion}" },
         File = artifacts + dockerFileName,
         BuildArg = new[] {$"package_version={packageVersion}"},
 		Platform = new[] { "linux/arm64", "linux/arm", "linux/amd64"},

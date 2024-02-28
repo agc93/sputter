@@ -27,14 +27,18 @@ internal class MQTTClient : IDisposable {
     }
 
     public async Task<Result> SendPayload(string topic, string payload) {
-        var client = await GetClient();
-        var applicationMessage = new MqttApplicationMessageBuilder()
-                .WithTopic(topic)
-                .WithPayload(payload)
-                .WithRetainFlag()
-                .Build();
-        var res = await client.PublishAsync(applicationMessage);
-        return res.IsSuccess ? Result.Ok() : Result.Fail(res.ReasonString);
+        try {
+            var client = await GetClient();
+            var applicationMessage = new MqttApplicationMessageBuilder()
+                    .WithTopic(topic)
+                    .WithPayload(payload)
+                    .WithRetainFlag()
+                    .Build();
+            var res = await client.PublishAsync(applicationMessage);
+            return res.IsSuccess ? Result.Ok() : Result.Fail(res.ReasonString);
+        } catch (Exception ex) {
+            return Result.Fail(ex.Message);
+        }
     }
 
     private async Task<IMqttClient> GetClient() {

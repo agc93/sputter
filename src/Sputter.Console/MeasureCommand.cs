@@ -61,7 +61,7 @@ public class MeasureCommand : AsyncCommand<MeasureCommand.Settings> {
                     new Markup(measure.Key.Id),
                     new Markup(measure.Key.UniqueId.SerialNumber),
                     propsTable,
-                    new Panel(temp == null ? "???" : temp.Value.ToString() + temp.Units),
+                    new Panel(temp == null ? "???" : temp.Value.ToString("N2") + temp.Units),
                     new Markup(string.Join(Environment.NewLine, measure.Value.States.Select(s => $"{(s.FriendlyName ?? s.AttributeName)}: [steelblue3]{s.Value}[/]")))
                     );
             }
