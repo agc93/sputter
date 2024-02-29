@@ -1,0 +1,44 @@
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+name: Sputter
+version: "0.0.0-preview.0.12"
+slug: sputter_ha
+description: Sputter add-on for Home Assistant
+url: "https://github.com/agc93/sputter/tree/main/addon"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+startup: application
+ports:
+  "8080/tcp": 8194
+ports_description:
+  8080/tcp: "Primary API endpoint for Sputter"
+host_dbus: true
+image: "quay.io/sputter/server"
+backup: cold
+stage: experimental
+environment:
+  "MQTT__EnableHomeAssistant": "true"
+  "LOGGING__LOGLEVEL__DEFAULT": "Debug"
+  "LOGGING__LOGLEVEL__ZIGGYCREATURES": "Information"
+options:
+  broker: core-mosquitto.local.hass.io
+  userName: null
+  password: null
+  port: 1883
+  autoMeasureInterval: 300
+  driveTemplates: []
+schema:
+  broker: str?
+  userName: str?
+  password: str?
+  port: int?
+  autoMeasureInterval: int?
+  driveTemplates:
+    - str?
+  scrutinyApiAddress: str?
+  singleDeviceMode: bool?
+  deviceArea: str?
+  expireAfter: int?
+  enableAllDrives: bool?
+  enableAllSensors: bool?

@@ -30,7 +30,8 @@ internal static class AddonConfigurationLoader {
         LoadIfSet(dict, content.SingleDeviceMode, $"MQTT:{nameof(MQTTConfiguration.HomeAssistant)}:{nameof(MQTTConfiguration.HomeAssistant.SingleDeviceMode)}");
         LoadIfSet(dict, content.DeviceArea, $"MQTT:{nameof(MQTTConfiguration.HomeAssistant)}:{nameof(MQTTConfiguration.HomeAssistant.DeviceArea)}");
         LoadIfSet(dict, content.ExpireAfter, $"MQTT:{nameof(MQTTConfiguration.HomeAssistant)}:{nameof(MQTTConfiguration.HomeAssistant.ExpireAfter)}");
-        LoadIfSet(dict, content.EnableAllDrives, $"MQTT:{nameof(MQTTConfiguration.HomeAssistant)}:{nameof(MQTTConfiguration.HomeAssistant.EnableAllSensors)}");
+        LoadIfSet(dict, content.EnableAllDrives, $"Sputter:{nameof(ServerConfiguration.AllowPublishingAll)}");
+        LoadIfSet(dict, content.EnableAllSensors, $"MQTT:{nameof(MQTTConfiguration.HomeAssistant)}:{nameof(MQTTConfiguration.HomeAssistant.EnableAllSensors)}");
         LoadCollectionIfSet(dict, content.DriveTemplates, $"Sputter:{nameof(ServerConfiguration.Drives)}");
         return dict;
     }

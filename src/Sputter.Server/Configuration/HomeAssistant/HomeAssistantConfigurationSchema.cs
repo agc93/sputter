@@ -12,4 +12,5 @@ public class HomeAssistantConfigurationSchema {
     public string? DeviceArea { get; set; }
     public int? ExpireAfter { get; set; }
     public bool? EnableAllDrives { get; set; }
+	public bool? EnableAllSensors { get; set; }
 }

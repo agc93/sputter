@@ -1,0 +1,50 @@
+---
+configuration:
+  broker:
+    name: MQTT Broker
+    description: >-
+      The address of your MQTT broker server. If you do not specify a server here, Sputter will not publish temperatures over MQTT.
+  userName:
+    name: MQTT User Name
+    description: >-
+      Optional user name if your MQTT server uses authentication
+  password:
+    name: MQTT Password
+    description: >-
+      Optional password if your MQTT server uses authentication
+  port:
+    name: MQTT Port
+    description: >-
+      Port used to connect to your MQTT Server
+  autoMeasureInterval:
+    name: Automatic Measurement Interval
+    description: >-
+      Interval (in seconds) between automatically grabbing measurements. If you don't specify an interval here, Sputter will only measure your drives on-demand.
+  scrutinyApiAddress:
+    name: Scrutiny API Address
+    description: >-
+      Optional address of a running Scrutiny server instance to gather drive temperatures from. Must be a full URL, such as https://scrutiny.mydomain.io/api/ or http://192.168.0.100:8080/api/
+  singleDeviceMode:
+    name: Single Device Mode
+    description: >-
+      By default (if you have MQTT enabled), Sputter will create a device in Home Assistant for each monitored drive. If you turn this on, it will instead create a single "Sputter" device and add all the drive sensors to that one device.
+  deviceArea:
+    name: Device Area
+    description: >-
+      The default area for devices created in Home Assistant. Optional.
+  expireAfter:
+    name: Expire Sensor Data After
+    description: >-
+      Optionally expire sensor data after this many seconds. This can lead to unexpected "Unavailable" states, but makes it more obvious when sensor data stops being received.
+  enableAllDrives:
+    name: Allow Publishing All Drives
+    description: >-
+      By default, Sputter will only publish drive sensors to Home Assistant if you have configured drive filters to prevent "overloading" HA with a lot of drives. If you enable this, Sputter will add devices for all discovered drives to HA even without any filters.
+  enableAllSensors:
+    name: Enable All Drive Sensors
+    description: >-
+      By default, only temperature sensors are enabled when added to Home Assistant (rather than added, but disabled by default). Enable this to enable all discovered sensors.
+  driveTemplates:
+    name: Drive Filters
+    description: >-
+      Filters to match against discovered drives. Only drives that match these filters will be published over MQTT.

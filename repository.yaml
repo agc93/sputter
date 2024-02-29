@@ -1,0 +1,4 @@
+# https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
+name: "Sputter Home Assistant add-on repository"
+url: 'https://github.com/agc93/sputter'
+maintainer: agc93 <info@agc93.dev>
