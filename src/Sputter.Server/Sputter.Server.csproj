@@ -13,6 +13,7 @@
   <PropertyGroup>
     <IsPublishable>true</IsPublishable>
     <IsPackable>false</IsPackable>
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
   </PropertyGroup>
 
   <ItemGroup>

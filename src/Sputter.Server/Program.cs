@@ -32,7 +32,7 @@ builder.Services.AddSwaggerGen();
 builder.Configuration.AddHomeAssistantAddOnConfiguration("addon.json");
 #endif
 builder.Configuration.AddHomeAssistantAddOnConfiguration();
-builder.Configuration.AddJsonFile("config.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddJsonFile("sputter.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddEnvironmentVariables();
 
 var caching = builder.Configuration.GetSection("Caching").Get<CachingConfiguration>() ?? new CachingConfiguration();
