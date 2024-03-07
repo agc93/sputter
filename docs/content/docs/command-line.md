@@ -30,6 +30,8 @@ OPTIONS:
         --mqtt-credentials
 ```
 
+The default command will discover any local drives using the [default adapters](./reference/adapters.md) and gather measurements from all of them.
+
 ## Drive Filter
 
 If you only want to gather measurements from a subset of drives you can provide a _filter_. Filters can work a little different for each adapter but the usual behaviour is a basic wildcard match against detected drive's serial number and model number. That is, if you provide a filter like `"Z52*"`, Sputter will only gather measurements for drives where the serial number or model number starts with `Z52`
