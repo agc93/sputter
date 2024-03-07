@@ -7,6 +7,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+var isLatest = Argument("tag-latest", true);
 
 ///////////////////////////////////////////////////////////////////////////////
 // VERSIONING
@@ -145,7 +146,10 @@ Task("Publish-Runtime")
 				OutputDirectory = runtimeDir,
 				PublishSingleFile = true,
 				SelfContained = true,
-				ArgumentCustomization = args => args.Append($"/p:Version={packageVersion}").Append("/p:AssemblyVersion=1.0.0.0")
+				ArgumentCustomization = args => args
+					.Append($"/p:Version={packageVersion}")
+					.Append("/p:AssemblyVersion=1.0.0.0")
+					// .Append("/p:AssemblyName=sputter")
 			};
 			DotNetPublish(projPath, settings);
 			CreateDirectory($"{artifacts}archive");
@@ -208,8 +212,13 @@ Task("Publish-Docker-Image")
     var dockerFileName = "publish.Dockerfile";
 	Information("Building Docker image...");
 	CopyFileToDirectory($"./build/{dockerFileName}", artifacts);
+	var tags = new List<string> { $"quay.io/sputter/server:{packageVersion}" };
+	if (isLatest) {
+		// Don't want to add named tags yet
+		// tags.Add("quay.io/sputter/server:latest");
+	}
 	var bSettings = new DockerBuildXBuildSettings {
-        Tag = new[] { $"quay.io/sputter/server:{packageVersion}" },
+        Tag = tags.ToArray(),
         File = artifacts + dockerFileName,
         BuildArg = new[] {$"package_version={packageVersion}"},
 		Platform = new[] { "linux/arm64", "linux/arm", "linux/amd64"},
@@ -232,6 +241,6 @@ Task("Publish")
 Task("Release")
 	.IsDependentOn("Publish")
 	.IsDependentOn("Publish-NuGet-Package")
-	.IsDependentOn("Publish-Docker-Image");
+	.IsDependentOn(string.IsNullOrWhiteSpace(EnvironmentVariable("QUAY_TOKEN")) ? "Build-Docker-Image" : "Publish-Docker-Image");
 
 RunTarget(target);
