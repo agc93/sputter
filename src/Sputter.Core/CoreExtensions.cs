@@ -62,6 +62,13 @@ public static class CoreExtensions {
         }
     }
 
+    public static bool MatchesFilter(this DriveEntity entity, string? filter) {
+        if (filter == null) return true;
+        return filter.WildcardMatch(entity.UniqueId.SerialNumber)
+            || ((!string.IsNullOrWhiteSpace(entity.UniqueId.WWN)) && filter.WildcardMatch(entity.UniqueId.WWN))
+            || ((!string.IsNullOrWhiteSpace(entity.UniqueId.ModelNumber)) && filter.WildcardMatch(entity.UniqueId.ModelNumber));
+    }
+
     public static async Task<List<T>> WaitForAll<T>(this IAsyncEnumerable<T> inputResults) {
         var output = new List<T>();
         await foreach (var result in inputResults) {
@@ -88,5 +95,9 @@ public static class CoreExtensions {
     public static Dictionary<string, DriveMeasurement?> ToDiskDictionary(this IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>> measurements, bool indexOnSerialNumber) {
         var dict = measurements.ToDictionary(kv => indexOnSerialNumber ? kv.Key.UniqueId.SerialNumber : kv.Key.Id, v => v.Value, StringComparer.OrdinalIgnoreCase);
         return dict;
+    }
+
+    public static string ToObjectId(this string input, char separator = '-', bool forceLowerCase = false) {
+        return string.Join(separator, input.Split(" ").Select(w => forceLowerCase ? w.ToLower() : w));
     }
 }

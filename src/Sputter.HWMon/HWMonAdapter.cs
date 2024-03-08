@@ -9,8 +9,16 @@ public class HWMonAdapter : IDriveSensorAdapter {
             .Select(GetDriveDetails)
             .Where(s => s is HWMonEntity and not null)
             .Cast<HWMonEntity>()
+            .Where(d => MatchesFilter(d, filter))
             .ToList();
         return Task.FromResult<IEnumerable<DriveEntity>>(drives);
+    }
+
+    private static bool MatchesFilter(HWMonEntity entity, string? filter) {
+        if (filter == null) return true;
+        return filter.WildcardMatch(entity.UniqueId.SerialNumber)
+            || ((!string.IsNullOrWhiteSpace(entity.UniqueId.WWN)) && filter.WildcardMatch(entity.UniqueId.WWN))
+            || ((!string.IsNullOrWhiteSpace(entity.UniqueId.ModelNumber)) && filter.WildcardMatch(entity.UniqueId.ModelNumber));
     }
 
     public Task<DriveMeasurement?> MeasureDrive(DriveEntity drive) {
@@ -91,6 +99,18 @@ public class HWMonAdapter : IDriveSensorAdapter {
         return null;
     }
 
+    private static string? GetDeviceFileContents(string? filePath) {
+        return !string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath)
+            ? File.ReadAllText(filePath).Trim()
+            : null;
+    }
+
+    private static bool TryGetDeviceFile(string? filePath, out string contents) {
+        var res = GetDeviceFileContents(filePath);
+        contents = res!;
+        return !string.IsNullOrWhiteSpace(res);
+    }
+
     private static KeyValuePair<string, UniqueId>? GetIdForBlockDevice(string sysClassPath, out Dictionary<string, string> otherProperties) {
         otherProperties = [];
         var rootDeviceName = new DirectoryInfo(sysClassPath).Name;
@@ -115,7 +135,24 @@ public class HWMonAdapter : IDriveSensorAdapter {
                     return new(dict.GetValueOrDefault(HWMonConstants.DiskIdentifier) ?? shortSerial, unique);
                 }
             }
-        } catch {}
+            var sysDevicePath = Path.Combine(blockDeviceName, "device");
+            var serialFile = Path.Combine(sysDevicePath, "serial");
+            var modelFile = Path.Combine(sysDevicePath, "model");
+            if (Directory.Exists(sysDevicePath) && File.Exists(serialFile) && File.Exists(modelFile)) {
+                if (TryGetDeviceFile(serialFile, out var serial)) {
+                    var model = GetDeviceFileContents(modelFile);
+                    if (TryGetDeviceFile(Path.Combine(sysDevicePath, "firmware_rev"), out var revision)) {
+                        otherProperties.Add(HWMonConstants.FirmwareVersion, revision);
+                    }
+                    var id = new UniqueId(serial, model);
+                    return new($"{model} {serial}".ToObjectId('_'), id);
+                }
+            }
+        } catch {
+#if DEBUG
+            throw;
+#endif
+        }
         return null;
     }
 
