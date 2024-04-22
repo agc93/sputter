@@ -74,3 +74,23 @@ setx ASPNETCORE_URLS "http://localhost:5001"
 
 {{% /tab %}}
 {{< /tabs >}}
+
+## Plugins
+
+If you are using any Sputter plugins, unpack them into folders in a `plugins` folder in the same directory as the server. For example, for the LibreHardwareMonitor plugin:
+
+```text
+│   appsettings.json
+│   Sputter.Server.exe
+└───plugins
+	└───Sputter.LibreHardwareMonitor
+		│   // trimmed for brevity
+		│   Sputter.Composition.dll
+		│   Sputter.Core.dll
+		│   Sputter.LibreHardwareMonitor.deps.json
+		│   Sputter.LibreHardwareMonitor.dll
+		└───runtimes
+			└─── // trimmed
+```
+
+{{< alert text="The plugin folder **must** be named the same as the plugin assembly (i.e. `Sputter.LibreHardwareMonitor` in the example above)!" />}}

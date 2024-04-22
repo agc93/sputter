@@ -25,6 +25,7 @@ var solution = ParseSolution(solutionPath);
 var projects = GetProjects(solutionPath, configuration);
 var artifacts = "./dist/";
 var testResultsPath = MakeAbsolute(Directory(artifacts + "./test-results"));
+var plugins = new List<string> { "Sputter.LibreHardwareMonitor" };
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -136,28 +137,52 @@ Task("Publish-Runtime")
 				.Append("/p:NoWarn=\"IL2104 IL2072 IL2087\"")
 		});
 		var runtimes = new[] { "win-x64", "linux-x64", "linux-arm64"};
-		foreach (var runtime in runtimes) {
-			var runtimeDir = $"{projectDir}/{project.Name}/{runtime}";
-			// CreateDirectory(runtimeDir);
-			Information("Publishing {0} for {1} runtime", project.Name, runtime);
-			var settings = new DotNetPublishSettings {
-				Runtime = runtime,
-				Configuration = configuration,
-				OutputDirectory = runtimeDir,
-				PublishSingleFile = true,
-				SelfContained = true,
-				ArgumentCustomization = args => args
-					.Append($"/p:Version={packageVersion}")
-					.Append("/p:AssemblyVersion=1.0.0.0")
-					// .Append("/p:AssemblyName=sputter")
-			};
-			DotNetPublish(projPath, settings);
-			CreateDirectory($"{artifacts}archive");
-			if (DirectoryExists(runtimeDir)) {
-				Zip(runtimeDir, $"{artifacts}archive/sputter-{project.Name.Split('.').Last().ToLower()}-{runtime}.zip");
+		// plugins don't get native builds
+		if (!plugins.Contains(project.Name)) {
+			foreach (var runtime in runtimes) {
+				var runtimeDir = $"{projectDir}/{project.Name}/{runtime}";
+				// CreateDirectory(runtimeDir);
+				Information("Publishing {0} for {1} runtime", project.Name, runtime);
+				var settings = new DotNetPublishSettings {
+					Runtime = runtime,
+					Configuration = configuration,
+					OutputDirectory = runtimeDir,
+					PublishSingleFile = true,
+					SelfContained = true,
+					ArgumentCustomization = args => args
+						.Append($"/p:Version={packageVersion}")
+						.Append("/p:AssemblyVersion=1.0.0.0")
+						// .Append("/p:AssemblyName=sputter")
+				};
+				DotNetPublish(projPath, settings);
+				CreateDirectory($"{artifacts}archive");
+				if (DirectoryExists(runtimeDir)) {
+					Zip(runtimeDir, $"{artifacts}archive/sputter-{project.Name.Split('.').Last().ToLower()}-{runtime}.zip");
+				}
 			}
 		}
 	}
+});
+
+Task("Publish-Plugins")
+	.IsDependentOn("Build")
+	.Does(() =>
+{
+	var pluginsDir = $"{artifacts}plugins";
+	CreateDirectory(pluginsDir);
+	foreach(var project in projects.SourceProjects.Where(p => plugins.Contains(p.Name))) {
+		DotNetPublish(project.Path.FullPath, new DotNetPublishSettings {
+			OutputDirectory = pluginsDir + "/" + project.Name,
+			Configuration = configuration,
+			PublishSingleFile = false,
+			SelfContained = false,
+			PublishTrimmed = false,
+			NoBuild = true,
+			NoRestore = true,
+		});
+	}
+	CreateDirectory($"{artifacts}archive");
+	Zip(pluginsDir, $"{artifacts}archive/sputter-plugins.zip");
 });
 
 Task("NuGet")
@@ -235,6 +260,7 @@ Task("Default")
 
 Task("Publish")
 	.IsDependentOn("Publish-Runtime")
+	.IsDependentOn("Publish-Plugins")
 	.IsDependentOn("NuGet")
 	.IsDependentOn("Build-Docker-Image");
 
