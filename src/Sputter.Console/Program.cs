@@ -17,6 +17,7 @@ internal class Program {
         var services = new ServiceCollection();
         services.AddSputterDefaults([typeof(DBusAdapter), typeof(HWMonAdapter)]);
         services.AddMediatR(m => m.AddSputterComponents(s => s.EnableAggregation()));
+		services.AddSputterPlugins();
         //services.AddSputterWithMediatR(c => c.EnableAggregation());
         // add extra services to the container here
         using var registrar = new DependencyInjectionRegistrar(services);
