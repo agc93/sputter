@@ -1,4 +1,4 @@
-﻿namespace Sputter.MQTT.HomeAssistant;
+namespace Sputter.MQTT.HomeAssistant;
 
 public class HomeAssistantConfiguration {
     public string? DeviceArea { get; set; }
