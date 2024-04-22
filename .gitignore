@@ -406,3 +406,4 @@ appsettings.Development.json
 dist/
 artifacts/
 tools/*
+out/

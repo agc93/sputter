@@ -66,3 +66,22 @@ sputter --mqtt-server my-mqtt-server:1337 --mqtt-credentials "user:password"
 ```
 
 Running this will still display any gathered measurements as usual, but now results will also be published to your MQTT broker.
+
+## Plugins
+
+If you are using any Sputter plugins, unpack them into folders in a `plugins` folder in the same directory as the binary. For example, for the LibreHardwareMonitor plugin:
+
+```text
+│   sputter.exe
+└───plugins
+	└───Sputter.LibreHardwareMonitor
+		│   // trimmed for brevity
+		│   Sputter.Composition.dll
+		│   Sputter.Core.dll
+		│   Sputter.LibreHardwareMonitor.deps.json
+		│   Sputter.LibreHardwareMonitor.dll
+		└───runtimes
+			└─── // trimmed
+```
+
+{{< alert text="The plugin folder **must** be named the same as the plugin assembly (i.e. `Sputter.LibreHardwareMonitor` in the example above)!" />}}

@@ -5,5 +5,5 @@ namespace Sputter.DBus;
 
 [method: SetsRequiredMembers]
 public class DBusEntity(string id, UniqueId uniqueId) : DriveEntity(id, uniqueId) {
-    internal DBusDrive? Drive { get; init; } = null;
+	internal DBusDrive? Drive { get; init; } = null;
 }

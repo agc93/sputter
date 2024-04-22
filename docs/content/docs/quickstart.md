@@ -42,3 +42,11 @@ If you now hit `http://localhost:8080/measurements`, Sputter will use the HWMon 
 ### Native
 
 To run the server, download the correct release from [GitHub Releases](https://github.com/agc93/sputter/releases), making sure to download the matching `sputter-server-*` file for your target platform/architecture of choice. Unzip the archive somewhere convenient, and run `Sputter.Server`/`Sputter.Server.exe` to start the server. Open your browser and hit `http://localhost:5000/measurements to get all the measurements for any local drives.
+
+## Windows Support
+
+If you're on Windows, none of the bundled [adapters](./reference/adapters.md) will be able to read your local system's drive temperatures. You can, however, install a plugin using Sputter's plugin system that will enable reading your local drive temperatures using the excellent LibreHardwareMonitor library.
+
+{{< alert text="This is distributed as a plugin as it only used on Windows systems and is not always the fastest." />}}
+
+You can download the plugin from the [latest release](https://github.com/agc93/sputter/releases), then install it as per the instructions for either the [Command-Line Interface (CLI)](./command-line.md#plugins) or [Server](./server/usage.md#plugins).

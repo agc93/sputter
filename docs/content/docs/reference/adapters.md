@@ -32,3 +32,13 @@ The HWMon/`sysfs`/`/sys` adapter uses the support for drive temperature sensors 
 ### Scrutiny
 
 The Scrutiny adapter uses the API in [Scrutiny](https://github.com/AnalogJ/scrutiny) to collect drives and drive temperatures from a running Scrutiny instance. Unless you have [drive filters](../server/configuration.md#drive-filters) set up, Sputter will collect **any** drives in your Scrutiny instance and return the drives and temperatures just like any locally-discovered drives.
+
+## Plugins
+
+### LibreHardwareMonitor
+
+{{< alert context="info" text="This adapter is distributed only as a plugin and is not bundled with the default server!" />}}
+
+The LibreHardwareMonitor plugin uses the excellent [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) project to read the temperature sensor of local drives on Windows. Note that you don't need the app itself installed, the plugin just uses the same library as the LHM desktop app to detect drives.
+
+With the plugin installed, using any of the usual Sputter requests (CLI or HTTP API) will poll the local computer for any drives with supported temperature sensors and include those in measurements.
