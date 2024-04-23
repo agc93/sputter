@@ -45,7 +45,7 @@ You can either provide filters with your request (over HTTP) or in the configura
 
 ```json
 {
-    "Scrutiny": {
+    "Sputter": {
         "Drives": [
             "dbus:ST8000VN004*",
             "*WD20EFRX*"

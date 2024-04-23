@@ -62,6 +62,9 @@ public static class SputterMediatRConfigurationExtensions {
 		if (sputterConfig.AddAggregator) {
 			configuration.AddBehavior<IPipelineBehavior<DriveMeasurementRequest, IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>>, MeasurementAggregatorBehaviour>();
 		}
+		if (sputterConfig.RoundMeasurements) {
+			configuration.AddBehavior<IPipelineBehavior<DriveMeasurementRequest, IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>>>, MeasurementRoundingBehaviour>();
+		}
 		return configuration;
 	}
 
