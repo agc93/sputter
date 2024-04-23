@@ -15,6 +15,7 @@ public class DriveEntity {
 		Model = uniqueId.ModelNumber;
 	}
 
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 	public string? Name { get; set; }
 	public required string Id { get; set; }
 
