@@ -247,7 +247,9 @@ Task("Publish-Docker-Image")
         File = artifacts + dockerFileName,
         BuildArg = new[] {$"package_version={packageVersion}"},
 		Platform = new[] { "linux/arm64", "linux/arm", "linux/amd64"},
-		Push = true
+		Push = true,
+		ArgumentCustomization = args => args
+            .Append($"--provenance=false")
     };
 	DockerBuildXBuild(bSettings, artifacts);
 	DeleteFile(artifacts + dockerFileName);
