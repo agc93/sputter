@@ -39,6 +39,7 @@ jobs:
         env:
           QUAY_TOKEN: ${{secrets.QUAY_TOKEN}}
           QUAY_USER: sputter+sputter_build
+          NUGET_TOKEN: ${{secrets.NUGET_TOKEN}}
       - uses: actions/upload-artifact@v4
         name: Upload Server
         with:
