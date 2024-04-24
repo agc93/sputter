@@ -33,8 +33,6 @@ public class MeasurementAggregator {
 				DriveMeasurement newMeasurement = BuildMergedMeasurement(group, uniqueKey, currentMeasure);
 				var key = BuildMergedEntity(existing.Key, currentAdapterEntity);
 				output.Add(key, newMeasurement);
-
-
 				//var newMeasurement = BuildMergedMeasurement(group, uniqueKey, existing.Value);
 				//output[existing.Key] = newMeasurement;
 			}
@@ -56,7 +54,8 @@ public class MeasurementAggregator {
 				newMeasurement.States.Add(measure);
 			}
 		}
-
+		var sources = group.Select(g => g.Value).ToList().GetSources();
+		newMeasurement.AddSources(sources);
 		return newMeasurement;
 	}
 

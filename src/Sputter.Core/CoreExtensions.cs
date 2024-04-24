@@ -76,18 +76,49 @@ public static class CoreExtensions {
 	}
 
 	public static void AddSource(this DriveMeasurement? measurement, string adapterName) {
+		measurement?.AddSources([adapterName]);
+	}
+
+	public static void AddSource(this DriveMeasurement? measurement, DriveMeasurement? sourceMeasurement) {
+		if (measurement != null && sourceMeasurement != null) {
+			var sourceStateValue = sourceMeasurement.States.FirstOrDefault(st => st.AttributeName == DriveAttributes.SourceAdapter);
+			if (sourceStateValue != null) {
+				measurement.AddSources(sourceStateValue.Value.SplitSources());
+			}
+		}
+	}
+
+	public static void AddSources(this DriveMeasurement? measurement, IEnumerable<string> adapterNames) {
 		if (measurement != null) {
 			var matching = measurement.States.FirstOrDefault(st => st.AttributeName == DriveAttributes.SourceAdapter);
 			if (matching != null) {
-				matching.Value = string.Join(';', matching.Value.Split(';').Concat([adapterName]));
+				matching.Value = string.Join(';', matching.Value.SplitSources().Concat(adapterNames).Distinct());
 			} else {
 				measurement.States.Add(
 					new DriveState {
 						AttributeName = DriveAttributes.SourceAdapter,
-						Value = adapterName
+						Value = adapterNames.Count() > 1 ? string.Join(';', adapterNames) : adapterNames.First()
 					});
 			}
 		}
+	}
+
+	public static List<string> GetSources(this IEnumerable<DriveMeasurement?> measurements) {
+		var sources = new List<string>();
+		foreach (var measure in measurements)
+		{
+			if (measure != null) {
+				var source = measure.States.FirstOrDefault(st => st.AttributeName == DriveAttributes.SourceAdapter);
+				if (source != null) {
+					sources.AddRange(source.Value.SplitSources());
+				}
+			}
+		}
+		return sources.Distinct().ToList();
+	}
+
+	internal static List<string> SplitSources(this string input) {
+		return [.. input.Split(';', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Distinct()];
 	}
 
 	public static Dictionary<string, DriveMeasurement?> ToDiskDictionary(this IEnumerable<KeyValuePair<DriveEntity, DriveMeasurement?>> measurements, bool indexOnSerialNumber) {
