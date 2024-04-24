@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <IsPublishable>false</IsPublishable>
-    <IsPackable>true</IsPackable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

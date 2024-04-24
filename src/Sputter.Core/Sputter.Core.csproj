@@ -9,6 +9,7 @@
 	<PropertyGroup>
 		<IsPublishable>false</IsPublishable>
 		<IsPackable>true</IsPackable>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,6 +18,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Sputter.Composition\Sputter.Composition.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="readme.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>
 
 </Project>

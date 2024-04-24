@@ -232,3 +232,58 @@ export CACHING__LIFETIME=60
 
 {{% /tab %}}
 {{< /tabs >}}
+
+
+## Example Configuration
+
+Purely for reference sake, here is a (personally verified) example configuration of how I use Sputter running in Docker, managed with Compose, to feed my drive temperatures into Home Assistant:
+
+{{< tabs tabTotal="2">}}
+{{% tab tabName="Sputter Configuration" %}}
+
+Here is the `sputter.json` file with a basic configuration for Sputter, using auto-measurements and the [MQTT](./configuration.md#mqtt) integration and [Home Assistant](./home-assistant/) integration to measure a selection of drives every 60 seconds.
+
+```jsonc
+{
+    "Sputter": {
+        "AutoMeasureInterval": 60,
+        "Drives": [
+            "dbus:*ST*",
+            "dbus:*WD20EFRX*"
+        ]
+    },
+    "MQTT": {
+        "Server": "192.168.0.68",
+        "UserName": "|REDACTED|",
+        "Password": "|REDACTED|",
+        "Port": 1883,
+        "EnableHomeAssistant": true,
+        "HomeAssistant": {
+            "DeviceArea": "Office",
+            "SingleDeviceMode": true,
+            "ExpireAfter": 600
+        }
+    }
+}
+```
+
+> Obviously you would need to adapt your MQTT server details and drive filters to match your own environment.
+> 
+{{% /tab %}}
+{{% tab tabName="Docker Compose" %}}
+
+Here is the Compose service definition I use to run Sputter on the host with the drives I want to monitor
+
+```yaml
+services:
+  sputter:
+    image: quay.io/sputter/server:{{< latest-version >}}
+    ports:
+      - 8196:8080
+    volumes:
+      - ./sputter.json:/app/sputter.json # this is the configuration file for Sputter
+      - /var/run/dbus:/var/run/dbus # bind mount the DBus socket to the container to measure drives
+```
+
+{{% /tab %}}
+{{< /tabs >}}

@@ -8,6 +8,7 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var isLatest = Argument("tag-latest", true);
+var isStable = EnvironmentVariable("GITHUB_REF")?.StartsWith("refs/tags/v") ?? false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // VERSIONING
@@ -39,6 +40,12 @@ Setup(ctx =>
 	if (FileExists("./build/.dotnet/dotnet.exe")) {
 		Information("Using local install of `dotnet` SDK!");
 		Context.Tools.RegisterFile("./build/.dotnet/dotnet.exe");
+	}
+	if (isLatest) {
+		Information("Publishing images as 'latest' (if publishing is enabled)!");
+	}
+	if (isStable) {
+		Information("Publishing images as 'stable' (if publishing is enabled)!");
 	}
 });
 
@@ -240,7 +247,10 @@ Task("Publish-Docker-Image")
 	var tags = new List<string> { $"quay.io/sputter/server:{packageVersion}" };
 	if (isLatest) {
 		// Don't want to add named tags yet
-		// tags.Add("quay.io/sputter/server:latest");
+		tags.Add("quay.io/sputter/server:latest");
+	}
+	if (isStable) {
+		tags.Add("quay.io/sputter/server:stable");
 	}
 	var bSettings = new DockerBuildXBuildSettings {
         Tag = tags.ToArray(),
