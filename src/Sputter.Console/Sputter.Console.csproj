@@ -25,6 +25,7 @@
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>sputter</ToolCommandName>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
+		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
