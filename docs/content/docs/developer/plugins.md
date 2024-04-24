@@ -1,5 +1,5 @@
 ---
-weight: 1105
+weight: 1205
 title: "Plugins"
 description: "Building plugins for Sputter"
 icon: integration_instructions
