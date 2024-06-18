@@ -62,7 +62,7 @@ public class ScrutinyApiAdapter : IDriveSensorAdapter {
         foreach (var drive in summaries) {
             if ((!string.IsNullOrWhiteSpace(drive.Device?.SerialNumber)) && MatchesFilter(drive, filter)) {
                 var dev = drive.Device;
-                var entity = new ScrutinyEntity(dev.SerialId ?? dev.WWN, new UniqueId(dev.SerialNumber, dev.ModelName)) {
+                var entity = new ScrutinyEntity(GetDeviceId(dev), new UniqueId(dev.SerialNumber, dev.ModelName)) {
                     DriveSummary = drive
                 };
                 entity.UniqueId.WWN = dev.WWN;
@@ -70,6 +70,14 @@ public class ScrutinyApiAdapter : IDriveSensorAdapter {
             }
         }
         return drives;
+
+        string GetDeviceId(ScrutinyDeviceDetails dev) {
+	        return string.IsNullOrWhiteSpace(dev.SerialId)
+		        ? string.IsNullOrWhiteSpace(dev.WWN)
+			        ? dev.SerialNumber
+			        : dev.WWN
+		        : dev.SerialId;
+        }
     }
 
     public Task<DriveEntity?> IdentifyDrive(string pathSpec, bool exactMatch = true) {
