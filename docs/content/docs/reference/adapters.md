@@ -42,3 +42,33 @@ The Scrutiny adapter uses the API in [Scrutiny](https://github.com/AnalogJ/scrut
 The LibreHardwareMonitor plugin uses the excellent [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) project to read the temperature sensor of local drives on Windows. Note that you don't need the app itself installed, the plugin just uses the same library as the LHM desktop app to detect drives.
 
 With the plugin installed, using any of the usual Sputter requests (CLI or HTTP API) will poll the local computer for any drives with supported temperature sensors and include those in measurements.
+
+### Synology API
+
+{{% alert context="warning" %}}
+This adapter is distributed only as a plugin and is not bundled with the default server! It is also considered in a preview state which means:
+
+- You might run into more issues and bugs than usual!
+- It is currently only compatible with the Server, not the CLI!
+
+Please report any issues you run into with this adapter.
+{{% /alert %}}
+
+The Synology API plugin connects to a Synology NAS running DSM to read the temperature of drives installed in a compatible NAS.
+
+Once you've installed the plugin, you'll need to add some details to your configuration file to allow Sputter to connect to your NAS:
+
+```json
+{
+  //trimmed for brevity
+  "Synology": [
+    {
+      "Host": "http://<NAS-hostname-or-IP>:5000",
+      "User": "<user-with-DSM-access>",
+      "Password": "<password>"
+    }
+  ]
+}
+```
+
+Once configured, the next time Sputter discovers available drives, it will authenticate as the given user to DSM (assuming single-factor login is available), and include any drives installed in your NAS in measurements. 

@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sputter.Composition", "Sput
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sputter.LibreHardwareMonitor", "Sputter.LibreHardwareMonitor\Sputter.LibreHardwareMonitor.csproj", "{F6007754-2FB0-4871-B575-0849FBD9C152}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sputter.Synology", "Sputter.Synology\Sputter.Synology.csproj", "{FBFEB69E-E9A8-48C7-85C6-31481275274A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{F6007754-2FB0-4871-B575-0849FBD9C152}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6007754-2FB0-4871-B575-0849FBD9C152}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6007754-2FB0-4871-B575-0849FBD9C152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBFEB69E-E9A8-48C7-85C6-31481275274A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBFEB69E-E9A8-48C7-85C6-31481275274A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBFEB69E-E9A8-48C7-85C6-31481275274A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBFEB69E-E9A8-48C7-85C6-31481275274A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

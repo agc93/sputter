@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPublishable>true</IsPublishable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sputter.Core\Sputter.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Flurl" Version="4.0.0" />
+        <PackageReference Include="Synology.Api.Client" Version="0.2.60" />
+        <PackageReference Include="ZiggyCreatures.FusionCache" Version="1.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+
+    </ItemGroup>
+
+    <PropertyGroup>
+        <OutDir>..\Sputter.Server\bin\Debug\net8.0\Plugins\Sputter.Synology\</OutDir>
+        <DebugType>Embedded</DebugType>
+    </PropertyGroup>
+
+</Project>

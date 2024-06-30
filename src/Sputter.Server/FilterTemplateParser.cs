@@ -7,7 +7,7 @@ namespace Sputter.Server;
 
 public class FilterTemplateParser(ILogger<FilterTemplateParser>? logger) {
     public DiscoveryTemplate? ParseTemplate(string filter) {
-        var parser = ZeroOrOne(Terms.Identifier().AndSkip(Terms.Char(':'))).And(OneOf(Terms.String(), GetPathParser()));
+        var parser = ZeroOrOne(Terms.Identifier(extraPart: c => c == '-').AndSkip(Terms.Char(':'))).And(OneOf(Terms.String(), GetPathParser()));
         var res = parser.Parse(filter);
         if (!string.IsNullOrWhiteSpace(res.Item1.ToString()) && !string.IsNullOrWhiteSpace(res.Item2.ToString())) {
             return new DiscoveryTemplate(res.Item2.ToString()) {
